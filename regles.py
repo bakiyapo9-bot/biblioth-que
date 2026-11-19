@@ -1,29 +1,30 @@
-"""Règles métier et validations du projet BiblioIT."""
+"""Règles métier de BiblioIIT."""
 from datetime import date, timedelta
 
-DUREE_EMPRUNT_JOURS = 14
+DUREE_EMPRUNT = 14  # en jours
+
 
 class ErreurBiblio(Exception):
-    """Erreur métier affichable à l'utilisateur."""
+    """Erreur métier affichée à l'utilisateur."""
 
-def normaliser_code(code: str) -> str:
-    return (code or "").strip().upper()
 
-def valider_matricule(matricule: str) -> str:
-    matricule = (matricule or "").strip().upper()
-    if len(matricule) < 4 or " " in matricule:
-        raise ErreurBiblio("Matricule invalide.")
-    return matricule
-
-def valider_code_livre(code: str) -> str:
-    code = normaliser_code(code)
+def valider_code(code: str) -> str:
+    code = code.strip().upper()
     if not code:
         raise ErreurBiblio("Le code du livre est obligatoire.")
     return code
 
-def date_retour_prevue(date_emprunt: date | None = None) -> date:
-    """Un emprunt dure 14 jours à partir de la date d'emprunt."""
-    return (date_emprunt or date.today()) + timedelta(days=DUREE_EMPRUNT_JOURS)
 
-def est_en_retard(date_prevue: date, aujourd_hui: date | None = None) -> bool:
-    return date_prevue < (aujourd_hui or date.today())
+def valider_matricule(matricule: str) -> str:
+    matricule = matricule.strip().upper()
+    if len(matricule) < 4 or " " in matricule:
+        raise ErreurBiblio("Matricule invalide.")
+    return matricule
+
+
+def date_retour_prevue(jour: date) -> date:
+    return jour + timedelta(days=DUREE_EMPRUNT)
+
+
+def jours_de_retard(date_prevue: date, aujourd_hui: date) -> int:
+    return max(0, (aujourd_hui - date_prevue).days)

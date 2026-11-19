@@ -1,0 +1,127 @@
+"""Catalogue de départ : 100 œuvres de la littérature africaine (romans, théâtre, poésie, contes).
+
+Les codes sont attribués dans l'ordre de la liste : L001, L002, ... L100.
+"""
+from modeles import Livre
+
+LIVRES = [
+    # (titre, auteur, année)
+    ("L'Aventure ambiguë", "Cheikh Hamidou Kane", 1961),
+    ("Les Soleils des indépendances", "Ahmadou Kourouma", 1968),
+    ("Une si longue lettre", "Mariama Bâ", 1979),
+    ("Allah n'est pas obligé", "Ahmadou Kourouma", 2000),
+
+    # --- Côte d'Ivoire ---
+    ("Monnè, outrages et défis", "Ahmadou Kourouma", 1990),
+    ("En attendant le vote des bêtes sauvages", "Ahmadou Kourouma", 1998),
+    ("Quand on refuse on dit non", "Ahmadou Kourouma", 2004),
+    ("Le Pagne noir", "Bernard Dadié", 1955),
+    ("Climbié", "Bernard Dadié", 1956),
+    ("Un Nègre à Paris", "Bernard Dadié", 1959),
+    ("Monsieur Thôgô-gnini", "Bernard Dadié", 1970),
+    ("Béatrice du Congo", "Bernard Dadié", 1970),
+    ("Îles de tempête", "Bernard Dadié", 1973),
+    ("Les Voix dans le vent", "Bernard Dadié", 1970),
+    ("Kocoumbo, l'étudiant noir", "Aké Loba", 1960),
+    ("Le Soleil noir point", "Charles Nokan", 1962),
+    ("Abraha Pokou", "Charles Nokan", 1970),
+    ("Les Sofas", "Bernard Zadi Zaourou", 1975),
+    ("La Carte d'identité", "Jean-Marie Adiaffi", 1980),
+    ("Silence, on développe", "Jean-Marie Adiaffi", 1992),
+    ("Les Frasques d'Ebinto", "Amadou Koné", 1975),
+    ("À vol d'oiseau", "Véronique Tadjo", 1986),
+    ("Le Royaume aveugle", "Véronique Tadjo", 1990),
+    ("L'Ombre d'Imana", "Véronique Tadjo", 2000),
+    ("Une vie de crabe", "Tanella Boni", 1990),
+    ("Matins de couvre-feu", "Tanella Boni", 2005),
+    ("Le Fils de la femme mâle", "Maurice Bandaman", 1993),
+    ("Bintou", "Koffi Kwahulé", 1997),
+    ("Big Shoot", "Koffi Kwahulé", 2000),
+    ("Babyface", "Koffi Kwahulé", 2006),
+    ("Elle sera de jaspe et de corail", "Werewere Liking", 1983),
+    ("Debout-Payé", "Gauz", 2014),
+
+    # --- Sénégal ---
+    ("Les Bouts de bois de Dieu", "Ousmane Sembène", 1960),
+    ("Ô pays, mon beau peuple !", "Ousmane Sembène", 1957),
+    ("Le Mandat", "Ousmane Sembène", 1966),
+    ("Xala", "Ousmane Sembène", 1973),
+    ("Un chant écarlate", "Mariama Bâ", 1981),
+    ("Les Gardiens du temple", "Cheikh Hamidou Kane", 1995),
+    ("Les Contes d'Amadou Koumba", "Birago Diop", 1947),
+    ("Les Nouveaux Contes d'Amadou Koumba", "Birago Diop", 1958),
+    ("Chants d'ombre", "Léopold Sédar Senghor", 1945),
+    ("Hosties noires", "Léopold Sédar Senghor", 1948),
+    ("Éthiopiques", "Léopold Sédar Senghor", 1956),
+    ("Nocturnes", "Léopold Sédar Senghor", 1961),
+    ("La Grève des bàttu", "Aminata Sow Fall", 1979),
+    ("L'Appel des arènes", "Aminata Sow Fall", 1982),
+    ("Maïmouna", "Abdoulaye Sadji", 1953),
+    ("Karim", "Ousmane Socé", 1935),
+    ("La Plaie", "Malick Fall", 1967),
+    ("Le Baobab fou", "Ken Bugul", 1982),
+    ("Riwan ou le chemin de sable", "Ken Bugul", 1999),
+    ("L'Exil d'Albouri", "Cheik Aliou Ndao", 1967),
+    ("Les Derniers Jours de Lat Dior", "Amadou Cissé Dia", 1965),
+    ("Murambi, le livre des ossements", "Boubacar Boris Diop", 2000),
+    ("Le Ventre de l'Atlantique", "Fatou Diome", 2003),
+    ("Frère d'âme", "David Diop", 2018),
+    ("La Plus Secrète Mémoire des hommes", "Mohamed Mbougar Sarr", 2021),
+    ("Terre ceinte", "Mohamed Mbougar Sarr", 2015),
+
+    # --- Guinée ---
+    ("L'Enfant noir", "Camara Laye", 1953),
+    ("Le Regard du roi", "Camara Laye", 1954),
+    ("Dramouss", "Camara Laye", 1966),
+    ("Soundjata ou l'épopée mandingue", "Djibril Tamsir Niane", 1960),
+    ("Les Crapauds-brousse", "Tierno Monénembo", 1979),
+    ("Le Roi de Kahel", "Tierno Monénembo", 2008),
+    ("Wirriyamu", "Williams Sassine", 1976),
+
+    # --- Mali ---
+    ("L'Étrange Destin de Wangrin", "Amadou Hampâté Bâ", 1973),
+    ("Amkoullel, l'enfant peul", "Amadou Hampâté Bâ", 1991),
+    ("Le Devoir de violence", "Yambo Ouologuem", 1968),
+    ("Sous l'orage", "Seydou Badian", 1957),
+    ("La Mort de Chaka", "Seydou Badian", 1962),
+    ("Le Lieutenant de Kouta", "Massa Makan Diabaté", 1979),
+
+    # --- Burkina Faso, Bénin, Togo ---
+    ("Crépuscule des temps anciens", "Nazi Boni", 1962),
+    ("Doguicimi", "Paul Hazoumé", 1938),
+    ("Un piège sans fin", "Olympe Bhêly-Quénum", 1960),
+    ("Kondo le requin", "Jean Pliya", 1966),
+    ("Le Carrefour", "Kossi Efoui", 1989),
+    ("Place des fêtes", "Sami Tchak", 2001),
+
+    # --- Cameroun ---
+    ("Ville cruelle", "Mongo Beti", 1954),
+    ("Le Pauvre Christ de Bomba", "Mongo Beti", 1956),
+    ("Une vie de boy", "Ferdinand Oyono", 1956),
+    ("Le Vieux Nègre et la médaille", "Ferdinand Oyono", 1956),
+    ("Trois prétendants… un mari", "Guillaume Oyônô Mbia", 1964),
+    ("C'est le soleil qui m'a brûlée", "Calixthe Beyala", 1987),
+    ("L'Intérieur de la nuit", "Léonora Miano", 2005),
+    ("La Saison de l'ombre", "Léonora Miano", 2013),
+
+    # --- Congo ---
+    ("La Vie et demie", "Sony Labou Tansi", 1979),
+    ("La Parenthèse de sang", "Sony Labou Tansi", 1981),
+    ("Le Pleurer-rire", "Henri Lopes", 1982),
+    ("Verre cassé", "Alain Mabanckou", 2005),
+    ("La Marmite de Koka-Mbala", "Guy Menga", 1966),
+    ("Johnny chien méchant", "Emmanuel Dongala", 2002),
+
+    # --- Autres pays d'Afrique ---
+    ("Le monde s'effondre", "Chinua Achebe", 1958),
+    ("La Mort et l'Écuyer du roi", "Wole Soyinka", 1975),
+    ("Le Lion et la Perle", "Wole Soyinka", 1963),
+    ("Et le blé jaillira", "Ngũgĩ wa Thiong'o", 1967),
+    ("L'Autre Moitié du soleil", "Chimamanda Ngozi Adichie", 2006),
+    ("Nedjma", "Kateb Yacine", 1956),
+    ("Petit Pays", "Gaël Faye", 2016),
+    ("Notre-Dame du Nil", "Scholastique Mukasonga", 2012),
+    ("Terre somnambule", "Mia Couto", 1992),
+]
+
+CATALOGUE = [Livre(f"L{numero:03d}", *infos) for numero, infos in enumerate(LIVRES, start=1)]

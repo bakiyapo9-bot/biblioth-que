@@ -1,22 +1,23 @@
-"""Couche de persistance SQLite : aucun traitement métier ici."""
+"""Accès à la base SQLite (aucune règle métier ici)."""
 import sqlite3
+from contextlib import closing
 from datetime import date
-from pathlib import Path
-from modeles import Livre, Emprunt
+
+from modeles import Emprunt, Livre
+
+# Un livre est disponible s'il n'a aucun emprunt sans date de retour.
+SELECT_LIVRES = """
+    SELECT code, titre, auteur, annee,
+           NOT EXISTS (SELECT 1 FROM emprunts
+                       WHERE code_livre = code AND date_retour_effective IS NULL)
+    FROM livres
+"""
+
 
 class DepotSQLite:
     def __init__(self, chemin: str = "bibliit.db"):
-        self.chemin = str(chemin)
-        self._initialiser()
-
-    def _connexion(self):
-        conn = sqlite3.connect(self.chemin)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
-        return conn
-
-    def _initialiser(self):
-        with self._connexion() as conn:
+        self.chemin = chemin
+        with closing(sqlite3.connect(chemin)) as conn:
             conn.executescript("""
                 CREATE TABLE IF NOT EXISTS livres (
                     code TEXT PRIMARY KEY,
@@ -32,78 +33,49 @@ class DepotSQLite:
                     date_retour_prevue TEXT NOT NULL,
                     date_retour_effective TEXT
                 );
-                CREATE UNIQUE INDEX IF NOT EXISTS un_emprunt_actif_par_livre
-                ON emprunts(code_livre) WHERE date_retour_effective IS NULL;
             """)
 
-    def ajouter_livre(self, livre: Livre):
-        with self._connexion() as conn:
-            conn.execute(
-                "INSERT OR IGNORE INTO livres(code,titre,auteur,annee) VALUES(?,?,?,?)",
-                (livre.code, livre.titre, livre.auteur, livre.annee)
-            )
+    def _executer(self, sql: str, parametres: tuple = ()) -> list:
+        """Exécute une requête, enregistre les modifications et renvoie les lignes."""
+        with closing(sqlite3.connect(self.chemin)) as conn:
+            with conn:  # commit automatique
+                return conn.execute(sql, parametres).fetchall()
 
-    def chercher_livres(self, terme: str = "") -> list[Livre]:
-        terme = f"%{terme.strip()}%"
-        with self._connexion() as conn:
-            rows = conn.execute("""
-                SELECT l.*,
-                       CASE WHEN e.id IS NULL THEN 1 ELSE 0 END AS disponible
-                FROM livres l
-                LEFT JOIN emprunts e
-                  ON e.code_livre=l.code AND e.date_retour_effective IS NULL
-                WHERE l.code LIKE ? COLLATE NOCASE
-                   OR l.titre LIKE ? COLLATE NOCASE
-                   OR l.auteur LIKE ? COLLATE NOCASE
-                ORDER BY l.titre
-            """, (terme, terme, terme)).fetchall()
-        return [Livre(r["code"], r["titre"], r["auteur"], r["annee"], bool(r["disponible"])) for r in rows]
+    def ajouter_livre(self, livre: Livre) -> None:
+        self._executer("INSERT OR IGNORE INTO livres VALUES (?, ?, ?, ?)",
+                       (livre.code, livre.titre, livre.auteur, livre.annee))
 
-    def obtenir_livre(self, code: str):
-        livres = self.chercher_livres(code)
-        return next((l for l in livres if l.code.upper() == code.upper()), None)
+    def chercher_livres(self, mot_cle: str) -> list[Livre]:
+        motif = f"%{mot_cle.strip()}%"
+        lignes = self._executer(
+            SELECT_LIVRES + " WHERE code LIKE ? OR titre LIKE ? OR auteur LIKE ? ORDER BY titre",
+            (motif, motif, motif))
+        return [Livre(c, t, a, an, bool(d)) for c, t, a, an, d in lignes]
 
-    def creer_emprunt(self, code: str, matricule: str, debut: date, retour_prevu: date) -> int:
-        with self._connexion() as conn:
-            cur = conn.execute("""
-                INSERT INTO emprunts(code_livre,matricule,date_emprunt,date_retour_prevue)
-                VALUES(?,?,?,?)
-            """, (code, matricule, debut.isoformat(), retour_prevu.isoformat()))
-            return cur.lastrowid
+    def obtenir_livre(self, code: str) -> Livre | None:
+        lignes = self._executer(SELECT_LIVRES + " WHERE code = ?", (code,))
+        return Livre(*lignes[0][:4], bool(lignes[0][4])) if lignes else None
 
-    def emprunt_actif(self, code: str, matricule: str | None = None):
-        sql = """SELECT * FROM emprunts
-                 WHERE code_livre=? AND date_retour_effective IS NULL"""
-        params = [code]
-        if matricule:
-            sql += " AND matricule=?"
-            params.append(matricule)
-        with self._connexion() as conn:
-            row = conn.execute(sql, params).fetchone()
-        return self._vers_emprunt(row) if row else None
+    def creer_emprunt(self, code: str, matricule: str, debut: date, retour: date) -> None:
+        self._executer(
+            "INSERT INTO emprunts (code_livre, matricule, date_emprunt, date_retour_prevue)"
+            " VALUES (?, ?, ?, ?)",
+            (code, matricule, debut.isoformat(), retour.isoformat()))
 
-    def retourner_emprunt(self, emprunt_id: int, jour: date):
-        with self._connexion() as conn:
-            conn.execute(
-                "UPDATE emprunts SET date_retour_effective=? WHERE id=? AND date_retour_effective IS NULL",
-                (jour.isoformat(), emprunt_id)
-            )
+    def terminer_emprunt(self, code: str, matricule: str, jour: date) -> bool:
+        """Enregistre le retour. Renvoie False si aucun emprunt en cours n'existe."""
+        lignes = self._executer(
+            "UPDATE emprunts SET date_retour_effective = ?"
+            " WHERE code_livre = ? AND matricule = ? AND date_retour_effective IS NULL"
+            " RETURNING id",
+            (jour.isoformat(), code, matricule))
+        return bool(lignes)
 
-    def lister_retards(self, aujourd_hui: date):
-        with self._connexion() as conn:
-            rows = conn.execute("""
-                SELECT e.*, l.titre FROM emprunts e
-                JOIN livres l ON l.code=e.code_livre
-                WHERE e.date_retour_effective IS NULL AND e.date_retour_prevue < ?
-                ORDER BY e.date_retour_prevue
-            """, (aujourd_hui.isoformat(),)).fetchall()
-        return [(self._vers_emprunt(r), r["titre"]) for r in rows]
-
-    @staticmethod
-    def _vers_emprunt(row):
-        return Emprunt(
-            row["id"], row["code_livre"], row["matricule"],
-            date.fromisoformat(row["date_emprunt"]),
-            date.fromisoformat(row["date_retour_prevue"]),
-            date.fromisoformat(row["date_retour_effective"]) if row["date_retour_effective"] else None
-        )
+    def lister_retards(self, aujourd_hui: date) -> list[Emprunt]:
+        lignes = self._executer("""
+            SELECT e.code_livre, l.titre, e.matricule, e.date_retour_prevue
+            FROM emprunts e JOIN livres l ON l.code = e.code_livre
+            WHERE e.date_retour_effective IS NULL AND e.date_retour_prevue < ?
+            ORDER BY e.date_retour_prevue
+        """, (aujourd_hui.isoformat(),))
+        return [Emprunt(c, t, m, date.fromisoformat(d)) for c, t, m, d in lignes]
