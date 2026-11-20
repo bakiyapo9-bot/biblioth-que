@@ -1,4 +1,3 @@
-"""Opérations de la bibliothèque : on vérifie les règles, puis on utilise le dépôt."""
 from datetime import date
 
 from catalogue import CATALOGUE
@@ -10,14 +9,13 @@ from regles import ErreurBiblio, date_retour_prevue, valider_code, valider_matri
 class ServiceBibliotheque:
     def __init__(self, depot: DepotSQLite):
         self.depot = depot
-        for livre in CATALOGUE:  # n'écrase pas les livres déjà présents
+        for livre in CATALOGUE:
             depot.ajouter_livre(livre)
 
     def rechercher(self, mot_cle: str = "") -> list[Livre]:
         return self.depot.chercher_livres(mot_cle)
 
     def emprunter(self, code: str, matricule: str, jour: date | None = None) -> date:
-        """Enregistre un emprunt et renvoie la date de retour prévue."""
         code, matricule = valider_code(code), valider_matricule(matricule)
         livre = self.depot.obtenir_livre(code)
         if livre is None:

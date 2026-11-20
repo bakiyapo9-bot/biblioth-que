@@ -1,11 +1,8 @@
-"""Accès à la base SQLite (aucune règle métier ici)."""
 import sqlite3
-from contextlib import closing
 from datetime import date
 
 from modeles import Emprunt, Livre
 
-# Un livre est disponible s'il n'a aucun emprunt sans date de retour.
 SELECT_LIVRES = """
     SELECT code, titre, auteur, annee,
            NOT EXISTS (SELECT 1 FROM emprunts
@@ -17,29 +14,31 @@ SELECT_LIVRES = """
 class DepotSQLite:
     def __init__(self, chemin: str = "bibliit.db"):
         self.chemin = chemin
-        with closing(sqlite3.connect(chemin)) as conn:
-            conn.executescript("""
-                CREATE TABLE IF NOT EXISTS livres (
-                    code TEXT PRIMARY KEY,
-                    titre TEXT NOT NULL,
-                    auteur TEXT NOT NULL,
-                    annee INTEGER
-                );
-                CREATE TABLE IF NOT EXISTS emprunts (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    code_livre TEXT NOT NULL REFERENCES livres(code),
-                    matricule TEXT NOT NULL,
-                    date_emprunt TEXT NOT NULL,
-                    date_retour_prevue TEXT NOT NULL,
-                    date_retour_effective TEXT
-                );
-            """)
+        conn = sqlite3.connect(chemin)
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS livres (
+                code TEXT PRIMARY KEY,
+                titre TEXT NOT NULL,
+                auteur TEXT NOT NULL,
+                annee INTEGER
+            );
+            CREATE TABLE IF NOT EXISTS emprunts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                code_livre TEXT NOT NULL REFERENCES livres(code),
+                matricule TEXT NOT NULL,
+                date_emprunt TEXT NOT NULL,
+                date_retour_prevue TEXT NOT NULL,
+                date_retour_effective TEXT
+            );
+        """)
+        conn.close()
 
     def _executer(self, sql: str, parametres: tuple = ()) -> list:
-        """Exécute une requête, enregistre les modifications et renvoie les lignes."""
-        with closing(sqlite3.connect(self.chemin)) as conn:
-            with conn:  # commit automatique
-                return conn.execute(sql, parametres).fetchall()
+        conn = sqlite3.connect(self.chemin)
+        lignes = conn.execute(sql, parametres).fetchall()
+        conn.commit()
+        conn.close()
+        return lignes
 
     def ajouter_livre(self, livre: Livre) -> None:
         self._executer("INSERT OR IGNORE INTO livres VALUES (?, ?, ?, ?)",
@@ -63,7 +62,6 @@ class DepotSQLite:
             (code, matricule, debut.isoformat(), retour.isoformat()))
 
     def terminer_emprunt(self, code: str, matricule: str, jour: date) -> bool:
-        """Enregistre le retour. Renvoie False si aucun emprunt en cours n'existe."""
         lignes = self._executer(
             "UPDATE emprunts SET date_retour_effective = ?"
             " WHERE code_livre = ? AND matricule = ? AND date_retour_effective IS NULL"

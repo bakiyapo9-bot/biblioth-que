@@ -1,17 +1,11 @@
-"""Catalogue de départ : 100 œuvres de la littérature africaine (romans, théâtre, poésie, contes).
-
-Les codes sont attribués dans l'ordre de la liste : L001, L002, ... L100.
-"""
 from modeles import Livre
 
 LIVRES = [
-    # (titre, auteur, année)
     ("L'Aventure ambiguë", "Cheikh Hamidou Kane", 1961),
     ("Les Soleils des indépendances", "Ahmadou Kourouma", 1968),
     ("Une si longue lettre", "Mariama Bâ", 1979),
     ("Allah n'est pas obligé", "Ahmadou Kourouma", 2000),
 
-    # --- Côte d'Ivoire ---
     ("Monnè, outrages et défis", "Ahmadou Kourouma", 1990),
     ("En attendant le vote des bêtes sauvages", "Ahmadou Kourouma", 1998),
     ("Quand on refuse on dit non", "Ahmadou Kourouma", 2004),
@@ -41,7 +35,6 @@ LIVRES = [
     ("Elle sera de jaspe et de corail", "Werewere Liking", 1983),
     ("Debout-Payé", "Gauz", 2014),
 
-    # --- Sénégal ---
     ("Les Bouts de bois de Dieu", "Ousmane Sembène", 1960),
     ("Ô pays, mon beau peuple !", "Ousmane Sembène", 1957),
     ("Le Mandat", "Ousmane Sembène", 1966),
@@ -69,7 +62,6 @@ LIVRES = [
     ("La Plus Secrète Mémoire des hommes", "Mohamed Mbougar Sarr", 2021),
     ("Terre ceinte", "Mohamed Mbougar Sarr", 2015),
 
-    # --- Guinée ---
     ("L'Enfant noir", "Camara Laye", 1953),
     ("Le Regard du roi", "Camara Laye", 1954),
     ("Dramouss", "Camara Laye", 1966),
@@ -78,7 +70,6 @@ LIVRES = [
     ("Le Roi de Kahel", "Tierno Monénembo", 2008),
     ("Wirriyamu", "Williams Sassine", 1976),
 
-    # --- Mali ---
     ("L'Étrange Destin de Wangrin", "Amadou Hampâté Bâ", 1973),
     ("Amkoullel, l'enfant peul", "Amadou Hampâté Bâ", 1991),
     ("Le Devoir de violence", "Yambo Ouologuem", 1968),
@@ -86,7 +77,6 @@ LIVRES = [
     ("La Mort de Chaka", "Seydou Badian", 1962),
     ("Le Lieutenant de Kouta", "Massa Makan Diabaté", 1979),
 
-    # --- Burkina Faso, Bénin, Togo ---
     ("Crépuscule des temps anciens", "Nazi Boni", 1962),
     ("Doguicimi", "Paul Hazoumé", 1938),
     ("Un piège sans fin", "Olympe Bhêly-Quénum", 1960),
@@ -94,7 +84,6 @@ LIVRES = [
     ("Le Carrefour", "Kossi Efoui", 1989),
     ("Place des fêtes", "Sami Tchak", 2001),
 
-    # --- Cameroun ---
     ("Ville cruelle", "Mongo Beti", 1954),
     ("Le Pauvre Christ de Bomba", "Mongo Beti", 1956),
     ("Une vie de boy", "Ferdinand Oyono", 1956),
@@ -104,7 +93,6 @@ LIVRES = [
     ("L'Intérieur de la nuit", "Léonora Miano", 2005),
     ("La Saison de l'ombre", "Léonora Miano", 2013),
 
-    # --- Congo ---
     ("La Vie et demie", "Sony Labou Tansi", 1979),
     ("La Parenthèse de sang", "Sony Labou Tansi", 1981),
     ("Le Pleurer-rire", "Henri Lopes", 1982),
@@ -112,7 +100,6 @@ LIVRES = [
     ("La Marmite de Koka-Mbala", "Guy Menga", 1966),
     ("Johnny chien méchant", "Emmanuel Dongala", 2002),
 
-    # --- Autres pays d'Afrique ---
     ("Le monde s'effondre", "Chinua Achebe", 1958),
     ("La Mort et l'Écuyer du roi", "Wole Soyinka", 1975),
     ("Le Lion et la Perle", "Wole Soyinka", 1963),

@@ -1,7 +1,3 @@
-"""Interface graphique de BiblioIIT (CustomTkinter).
-
-Lancement : python interfaces.py
-"""
 from datetime import date
 
 import customtkinter as ctk
@@ -10,9 +6,8 @@ from depot_sqlite import DepotSQLite
 from regles import ErreurBiblio, jours_de_retard
 from service import ServiceBibliotheque
 
-# Couleurs
 BLANC = "#ffffff"
-MENU = "#fff1e0"  # blanc orangé
+MENU = "#fff1e0"
 ORANGE = "#f07c1b"
 ORANGE_FONCE = "#d0650c"
 ORANGE_CLAIR = "#ffe0bf"
@@ -48,7 +43,6 @@ class Application(ctk.CTk):
         }
         self.afficher("recherche")
 
-    # ---------- Menu latéral ----------
     def creer_menu(self):
         menu = ctk.CTkFrame(self, width=240, corner_radius=0, fg_color=MENU)
         menu.grid(row=0, column=0, sticky="ns")
@@ -71,7 +65,6 @@ class Application(ctk.CTk):
                       command=self.destroy).pack(side="bottom", fill="x", padx=14, pady=20)
 
     def afficher(self, nom: str):
-        """Affiche la page choisie et met son bouton en surbrillance."""
         for cle, page in self.pages.items():
             page.grid_remove()
             self.boutons[cle].configure(fg_color="transparent", text_color=TEXTE)
@@ -82,7 +75,6 @@ class Application(ctk.CTk):
         elif nom == "retards":
             self.afficher_retards()
 
-    # ---------- Outils communs ----------
     def nouvelle_page(self, titre: str) -> ctk.CTkFrame:
         page = ctk.CTkFrame(self, fg_color=BLANC)
         ctk.CTkLabel(page, text=titre, font=("", 26, "bold"),
@@ -101,7 +93,6 @@ class Application(ctk.CTk):
                              font=("", 14, "bold"))
 
     def remplir(self, liste, lignes: list, message_vide: str):
-        """Affiche des lignes (texte, état, couleur de l'état) dans une liste."""
         for widget in liste.winfo_children():
             widget.destroy()
         if not lignes:
@@ -114,7 +105,6 @@ class Application(ctk.CTk):
             ctk.CTkLabel(ligne, text=etat, text_color=couleur,
                          font=("", 13, "bold")).pack(side="right", padx=14)
 
-    # ---------- Page 1 : recherche ----------
     def page_recherche(self) -> ctk.CTkFrame:
         page = self.nouvelle_page("Rechercher un livre")
         barre = ctk.CTkFrame(page, fg_color=BLANC)
@@ -137,7 +127,6 @@ class Application(ctk.CTk):
             lignes.append((texte, etat, couleur))
         self.remplir(self.liste_livres, lignes, "Aucun livre trouvé.")
 
-    # ---------- Pages 2 et 3 : emprunter / rendre ----------
     def page_formulaire(self, titre: str, action) -> ctk.CTkFrame:
         page = self.nouvelle_page(titre)
         code = self.champ(page, "Code du livre (ex. L002)")
@@ -163,7 +152,6 @@ class Application(ctk.CTk):
         self.service.rendre(code, matricule)
         return "Retour enregistré. Merci !"
 
-    # ---------- Page 4 : retards ----------
     def page_retards(self) -> ctk.CTkFrame:
         page = self.nouvelle_page("Retards")
         self.liste_retards = ctk.CTkScrollableFrame(page, fg_color=BLANC)

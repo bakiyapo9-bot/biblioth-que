@@ -1,4 +1,3 @@
-"""Objets métier de BiblioIIT."""
 from dataclasses import dataclass
 from datetime import date
 

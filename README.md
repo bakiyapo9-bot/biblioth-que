@@ -16,19 +16,23 @@ python interfaces.py
 La base `bibliit.db` est créée automatiquement avec un catalogue de 100 œuvres africaines (L001 à L100),
 défini dans `catalogue.py`.
 
-## Tests
-```bash
-python -m unittest discover -s tests -v
+## Arborescence
+
 ```
-
-## Organisation
-
-| Module            | Rôle                                 | Branche / membre      |
-|-------------------|--------------------------------------|-----------------------|
-| `regles.py`       | Validations, durée d'emprunt, retard | `feature/regles` — A  |
-| `catalogue.py`    | Les 100 livres de départ             | `feature/base` — C    |
-| `modeles.py`      | Classes `Livre` et `Emprunt`         | `feature/modeles` — B |
-| `depot_sqlite.py` | Accès à la base SQLite               | `feature/base` — C    |
-| `service.py`      | Rechercher, emprunter, rendre        | `feature/service` — D |
-| `interfaces.py`   | Interface graphique avec menu        | `feature/menu` — E    |
-| `tests/`          | Tests unitaires                      | chacun ses tests      |
+biblioth-que/
+├── .github/
+│   └── workflows/
+│       └── tests.yml
+├── tests/
+│   ├── test_regles.py
+│   └── test_service.py
+├── .gitignore
+├── catalogue.py
+├── depot_sqlite.py
+├── interfaces.py
+├── modeles.py
+├── regles.py
+├── service.py
+├── requirements.txt
+└── README.md
+```

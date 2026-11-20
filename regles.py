@@ -1,11 +1,10 @@
-"""Règles métier de BiblioIIT."""
 from datetime import date, timedelta
 
-DUREE_EMPRUNT = 14  # en jours
+DUREE_EMPRUNT = 14
 
 
 class ErreurBiblio(Exception):
-    """Erreur métier affichée à l'utilisateur."""
+    pass
 
 
 def valider_code(code: str) -> str:

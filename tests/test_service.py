@@ -40,7 +40,7 @@ class TestService(unittest.TestCase):
         self.service.emprunter("L002", "E2026-001")
         self.service.rendre("L002", "E2026-001")
         self.assertTrue(self.service.rechercher("L002")[0].disponible)
-        with self.assertRaises(ErreurBiblio):  # déjà rendu
+        with self.assertRaises(ErreurBiblio):
             self.service.rendre("L002", "E2026-001")
 
     def test_retards(self):
